@@ -1,0 +1,5 @@
+node_modules/
+*.mp4
+!anteprime/*.mp4
+_fotogrammi_*/
+.DS_Store

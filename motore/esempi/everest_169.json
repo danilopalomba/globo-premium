@@ -1,0 +1,51 @@
+{
+ "w": 1280,
+ "h": 720,
+ "fps": 30,
+ "u": 1.0,
+ "nome": "everest_169",
+ "durata": 8.0,
+ "terreno": 1.4,
+ "camera": [
+  {
+   "t": 0,
+   "lng": 86.5,
+   "lat": 29.5,
+   "zoom": 2.85,
+   "pitch": 0,
+   "bearing": 0
+  },
+  {
+   "t": 3.2,
+   "lng": 86.92,
+   "lat": 28.3,
+   "zoom": 8.25,
+   "pitch": 38,
+   "bearing": 0
+  },
+  {
+   "t": 8,
+   "lng": 86.925,
+   "lat": 28.06,
+   "zoom": 10.65,
+   "pitch": 46,
+   "bearing": -10
+  }
+ ],
+ "etichette": [
+  {
+   "tipo": "pin",
+   "testo": "EVEREST",
+   "sotto": "8.849 m",
+   "lng": 86.925,
+   "lat": 27.9881,
+   "da": 3.6,
+   "a": 99,
+   "altezza": 120
+  }
+ ],
+ "blue_marble_zoom": [
+  9.4,
+  10.6
+ ]
+}

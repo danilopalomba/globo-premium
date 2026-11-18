@@ -1,0 +1,55 @@
+{
+ "nome": "derinkuyu_spazio_169",
+ "w": 1280,
+ "h": 720,
+ "fps": 30,
+ "u": 1.0,
+ "durata": 6.0,
+ "terreno": 1.5,
+ "camera": [
+  {
+   "t": 0,
+   "lng": 25,
+   "lat": 35,
+   "zoom": 1.6,
+   "pitch": 0,
+   "bearing": 0
+  },
+  {
+   "t": 2.2,
+   "lng": 33.5,
+   "lat": 38.6,
+   "zoom": 4.6,
+   "pitch": 15,
+   "bearing": 0
+  },
+  {
+   "t": 5.2,
+   "lng": 34.735,
+   "lat": 38.43,
+   "zoom": 10.4,
+   "pitch": 45,
+   "bearing": -15
+  },
+  {
+   "t": 6,
+   "lng": 34.735,
+   "lat": 38.425,
+   "zoom": 10.7,
+   "pitch": 47,
+   "bearing": -18
+  }
+ ],
+ "etichette": [
+  {
+   "tipo": "pin",
+   "testo": "DERINKUYU",
+   "sotto": "Cappadocia \u00b7 Turchia",
+   "lng": 34.7346,
+   "lat": 38.3736,
+   "da": 4.0,
+   "a": 99,
+   "altezza": 150
+  }
+ ]
+}

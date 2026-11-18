@@ -1,0 +1,129 @@
+{
+ "nome": "Derinkuyu — dallo spazio alla Cappadocia, poi la linea del presunto tunnel per Kaymaklı",
+ "w": 1920,
+ "h": 1080,
+ "fps": 30,
+ "durata": 24,
+ "terreno": 1.6,
+ "camera": [
+  {
+   "t": 0,
+   "lng": -38,
+   "lat": 18,
+   "zoom": 1.15,
+   "pitch": 0,
+   "bearing": 0
+  },
+  {
+   "t": 4,
+   "lng": 8,
+   "lat": 30,
+   "zoom": 1.3,
+   "pitch": 0,
+   "bearing": 0
+  },
+  {
+   "t": 8,
+   "lng": 34.6,
+   "lat": 38.9,
+   "zoom": 4.7,
+   "pitch": 10,
+   "bearing": -4
+  },
+  {
+   "t": 12,
+   "lng": 34.78,
+   "lat": 38.55,
+   "zoom": 8.4,
+   "pitch": 38,
+   "bearing": -12
+  },
+  {
+   "t": 16,
+   "lng": 34.737,
+   "lat": 38.381,
+   "zoom": 12.4,
+   "pitch": 52,
+   "bearing": -24
+  },
+  {
+   "t": 21,
+   "lng": 34.745,
+   "lat": 38.418,
+   "zoom": 11.05,
+   "pitch": 46,
+   "bearing": -8
+  },
+  {
+   "t": 24,
+   "lng": 34.746,
+   "lat": 38.424,
+   "zoom": 10.95,
+   "pitch": 45,
+   "bearing": -4
+  }
+ ],
+ "etichette": [
+  {
+   "tipo": "regione",
+   "testo": "TURCHIA",
+   "lng": 33.5,
+   "lat": 39.3,
+   "da": 6.2,
+   "a": 9.6
+  },
+  {
+   "tipo": "regione",
+   "testo": "CAPPADOCIA",
+   "lng": 34.86,
+   "lat": 38.66,
+   "da": 9.8,
+   "a": 13.6
+  },
+  {
+   "tipo": "pin",
+   "testo": "DERINKUYU",
+   "sotto": "la città sotto la cantina · 1963",
+   "lng": 34.735,
+   "lat": 38.3736,
+   "da": 14.2,
+   "a": 16.3,
+   "altezza": 120
+  },
+  {
+   "tipo": "pin",
+   "testo": "KAYMAKLI",
+   "sotto": "un'altra città sotterranea",
+   "lng": 34.7509,
+   "lat": 38.4625,
+   "da": 19.4,
+   "a": 24,
+   "altezza": 90
+  }
+ ],
+ "percorsi": [
+  {
+   "da": 16.6,
+   "a": 19.6,
+   "stile": "tratteggio",
+   "punti": [
+    [
+     34.735,
+     38.3736
+    ],
+    [
+     34.743,
+     38.418
+    ],
+    [
+     34.7509,
+     38.4625
+    ]
+   ],
+   "nota": "tunnel di 8-9 km? mai verificato",
+   "nota_da": 20.2,
+   "nota_dx": 230,
+   "nota_dy": 0
+  }
+ ]
+}

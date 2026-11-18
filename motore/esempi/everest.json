@@ -1,0 +1,51 @@
+{
+ "w": 1080,
+ "h": 1920,
+ "fps": 30,
+ "u": 1.45,
+ "nome": "everest",
+ "durata": 8.0,
+ "terreno": 1.4,
+ "camera": [
+  {
+   "t": 0,
+   "lng": 86.5,
+   "lat": 29.5,
+   "zoom": 3.2,
+   "pitch": 0,
+   "bearing": 0
+  },
+  {
+   "t": 3.2,
+   "lng": 86.92,
+   "lat": 28.25,
+   "zoom": 8.6,
+   "pitch": 38,
+   "bearing": 0
+  },
+  {
+   "t": 8,
+   "lng": 86.925,
+   "lat": 28.04,
+   "zoom": 11.0,
+   "pitch": 50,
+   "bearing": -20
+  }
+ ],
+ "etichette": [
+  {
+   "tipo": "pin",
+   "testo": "EVEREST",
+   "sotto": "8.849 m",
+   "lng": 86.925,
+   "lat": 27.9881,
+   "da": 3.6,
+   "a": 99,
+   "altezza": 170
+  }
+ ],
+ "blue_marble_zoom": [
+  9.4,
+  10.6
+ ]
+}

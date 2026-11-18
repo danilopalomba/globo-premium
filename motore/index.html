@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<title>Globo</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/maplibre-gl@5.6.0/dist/maplibre-gl.css">
+<script src="https://cdn.jsdelivr.net/npm/maplibre-gl@5.6.0/dist/maplibre-gl.js"></script>
+<style>
+@font-face{font-family:M;src:url(font/Montserrat.ttf)}
+@font-face{font-family:MB;src:url(font/Montserrat-Bold.ttf)}
+@font-face{font-family:MK;src:url(font/Montserrat-Black.ttf)}
+html,body{margin:0;background:#02040a;overflow:hidden}
+#scena{position:relative;overflow:hidden;background:radial-gradient(ellipse at 50% 55%,#0b1630 0%,#050a17 45%,#010208 100%)}
+#stelle,#map,#sopra,#foschia{position:absolute;inset:0}
+#foschia{opacity:0;background:linear-gradient(180deg,#c9d6e6 0%,#b9b3a0 45%,#8a7556 100%)}
+#map canvas{filter:contrast(1.08) saturate(1.12) brightness(1.02)}
+.maplibregl-ctrl-attrib,.maplibregl-ctrl-logo{display:none!important}
+#vignetta{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at center,rgba(0,0,0,0) 55%,rgba(0,0,0,.55) 100%)}
+#crediti{position:absolute;left:1.6%;bottom:2.2%;font:400 calc(var(--u)*11px) M,sans-serif;color:rgba(255,255,255,.55);letter-spacing:.02em}
+.reg{position:absolute;transform:translate(-50%,-50%);text-align:center;white-space:nowrap;color:#fff}
+.reg b{display:block;font-family:MK,sans-serif;font-size:calc(var(--u)*64px);letter-spacing:.32em;text-shadow:0 0 calc(var(--u)*30px) rgba(0,0,0,.65),0 calc(var(--u)*2px) calc(var(--u)*6px) rgba(0,0,0,.8)}
+.reg i{display:block;margin:calc(var(--u)*10px) auto 0;height:calc(var(--u)*2px);background:linear-gradient(90deg,transparent,#ffd27a,transparent)}
+.pin{position:absolute;width:0;height:0}
+.pin .anello{position:absolute;border:calc(var(--u)*2px) solid #ffd27a;border-radius:50%;transform:translate(-50%,-50%)}
+.pin .punto{position:absolute;width:calc(var(--u)*14px);height:calc(var(--u)*14px);border-radius:50%;background:#ffd27a;box-shadow:0 0 calc(var(--u)*18px) #ffb84a;transform:translate(-50%,-50%)}
+.pin .asta{position:absolute;left:0;bottom:calc(var(--u)*8px);width:calc(var(--u)*2px);background:linear-gradient(#ffd27a,rgba(255,210,122,.2));transform:translateX(-50%)}
+.pin .carta{position:absolute;left:0;transform:translateX(-50%);white-space:nowrap;padding:calc(var(--u)*14px) calc(var(--u)*26px);border-radius:calc(var(--u)*14px);
+  background:rgba(8,12,20,.62);backdrop-filter:blur(calc(var(--u)*10px));border:1px solid rgba(255,210,122,.45);text-align:center;color:#fff;box-shadow:0 calc(var(--u)*12px) calc(var(--u)*40px) rgba(0,0,0,.5)}
+.pin .carta b{display:block;font-family:MK,sans-serif;font-size:calc(var(--u)*40px);letter-spacing:.14em}
+.pin .carta span{display:block;margin-top:calc(var(--u)*4px);font-family:M,sans-serif;font-size:calc(var(--u)*21px);color:#ffe3a8;letter-spacing:.03em}
+.nota{position:absolute;transform:translate(-50%,-50%);white-space:nowrap;font-family:MB,sans-serif;font-size:calc(var(--u)*24px);color:#fff;
+  padding:calc(var(--u)*8px) calc(var(--u)*18px);border-radius:999px;background:rgba(8,12,20,.6);border:1px dashed rgba(255,210,122,.7)}
+</style>
+</head>
+<body>
+<div id="scena"><canvas id="stelle"></canvas><div id="foschia"></div><div id="map"></div><div id="vignetta"></div><div id="sopra"></div><div id="crediti"></div></div>
+<script>
+// Globo premium — motore deterministico: window.avvia(cfg) e poi window.fotogramma(t) per ogni istante (render.mjs).
+const R = Math.PI / 180;
+const mx = lng => (lng + 180) / 360;
+const my = lat => (1 - Math.log(Math.tan(Math.PI / 4 + lat * R / 2)) / Math.PI) / 2;
+const lngOf = x => x * 360 - 180;
+const latOf = y => Math.atan(Math.sinh(Math.PI * (1 - 2 * y))) / R;
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const ease = s => s < .5 ? 4 * s * s * s : 1 - Math.pow(-2 * s + 2, 3) / 2;      // in-out cubica
+const easeOut = s => 1 - Math.pow(1 - s, 3);
+
+// cubica monotona (Fritsch-Carlson): velocità continua tra le chiavi, nessun rimbalzo
+function monotona(ts, vs) {
+  const n = ts.length, d = [], m = new Array(n).fill(0);
+  for (let i = 0; i < n - 1; i++) d.push((vs[i + 1] - vs[i]) / (ts[i + 1] - ts[i]));
+  for (let i = 1; i < n - 1; i++) m[i] = d[i - 1] * d[i] <= 0 ? 0 : 3 * (ts[i + 1] - ts[i - 1]) / ((2 * ts[i + 1] - ts[i] - ts[i - 1]) / d[i - 1] + (ts[i + 1] + ts[i] - 2 * ts[i - 1]) / d[i]);
+  return t => {
+    if (t <= ts[0]) return vs[0]; if (t >= ts[n - 1]) return vs[n - 1];
+    let i = 0; while (t > ts[i + 1]) i++;
+    const h = ts[i + 1] - ts[i], s = (t - ts[i]) / h, s2 = s * s, s3 = s2 * s;
+    return (2 * s3 - 3 * s2 + 1) * vs[i] + (s3 - 2 * s2 + s) * h * m[i] + (-2 * s3 + 3 * s2) * vs[i + 1] + (s3 - s2) * h * m[i + 1];
+  };
+}
+
+let map, C, cam, U = 1, OX = 0, OY = 0;
+const proietta = ll => { const q = map.project(ll); return { x: q.x - OX, y: q.y - OY }; };
+function stelle(w, h) {
+  const c = document.getElementById('stelle'); c.width = w; c.height = h; const g = c.getContext('2d');
+  let s = 7; const rnd = () => (s = (s * 16807) % 2147483647) / 2147483647;
+  for (let i = 0; i < w * h / 1800; i++) { const r = rnd() ** 3 * 1.6 * U + .3; g.fillStyle = `rgba(255,255,255,${.25 + rnd() * .75})`; g.beginPath(); g.arc(rnd() * w, rnd() * h, r, 0, 7); g.fill(); }
+}
+
+window.avvia = cfg => new Promise(ok => {
+  C = cfg; U = cfg.u || Math.max(cfg.w, cfg.h) / 1920;   // 17/11: anche 9:16 (1080x1920) ha testi a misura piena
+  const sc = document.getElementById('scena'); sc.style.width = cfg.w + 'px'; sc.style.height = cfg.h + 'px'; sc.style.setProperty('--u', U);
+  stelle(cfg.w, cfg.h);
+  // margine fuori quadro: la mappa è più grande della scena e si taglia, così i buchi del rilievo ai bordi non si vedono
+  OX = Math.round(cfg.w * (cfg.margine ?? .06)); OY = Math.round(cfg.h * (cfg.margine ?? .06));
+  Object.assign(document.getElementById('map').style, { inset: 'auto', left: -OX + 'px', top: -OY + 'px', width: cfg.w + 2 * OX + 'px', height: cfg.h + 2 * OY + 'px' });
+  const NOTTE = cfg.stile === 'notte';
+  const BM = (!NOTTE && cfg.blue_marble !== false) ? (cfg.blue_marble_zoom || [7.0, 8.2]).map(z => z + (cfg.zoom_off || 0)) : null;   // [zoom inizio, fine] del passaggio a Sentinel-2   // 18/11: Terra di notte NASA Black Marble 2016 (VIIRS, NASA Earth Observatory/GIBS, pubblico dominio), zoom max 8
+  document.getElementById('crediti').textContent = cfg.crediti || (NOTTE ? 'Terra di notte: NASA Black Marble 2016 (VIIRS, NASA Earth Observatory / GIBS) · Rilievo: AWS Terrain Tiles (Mapzen)' : (BM ? 'Immagini satellitari: NASA Blue Marble (NASA Earth Observatory) e ' : 'Immagini satellitari: ') + 'Sentinel-2 cloudless 2016 di EOX IT Services (s2maps.eu, dati Copernicus Sentinel modificati), CC BY 4.0 · Rilievo: AWS Terrain Tiles (Mapzen)');
+  const K = cfg.camera, ts = K.map(k => k.t);
+  const ch = f => monotona(ts, K.map(f));
+  cam = { x: ch(k => mx(k.lng)), y: ch(k => my(k.lat)), z: ch(k => k.zoom), p: ch(k => k.pitch || 0), b: ch(k => k.bearing || 0) };
+  map = new maplibregl.Map({
+    container: 'map', interactive: false, attributionControl: false, fadeDuration: 0, maxPitch: 80,
+    canvasContextAttributes: { antialias: true, preserveDrawingBuffer: true },
+    center: [K[0].lng, K[0].lat], zoom: K[0].zoom,
+    style: {
+      version: 8, projection: { type: 'globe' },
+      sky: NOTTE ? { 'atmosphere-blend': ['interpolate', ['linear'], ['zoom'], 0, .3, 5, .3, 8, 0], 'horizon-color': '#1a2f5c', 'sky-color': '#020611', 'horizon-fog-blend': .5, 'fog-color': '#0a1430', 'fog-ground-blend': .2, 'sky-horizon-blend': .5 } : { 'atmosphere-blend': ['interpolate', ['linear'], ['zoom'], 0, 1, 5, 1, 8, 0], 'horizon-color': '#9fc3ff', 'sky-color': '#0b1a3a', 'horizon-fog-blend': .6, 'fog-color': '#cfe0ff', 'fog-ground-blend': .15, 'sky-horizon-blend': .6 },
+      light: { anchor: 'map', position: [1.5, 210, 35], intensity: .35 },
+      sources: {
+        sat: NOTTE ? { type: 'raster', tileSize: 256, maxzoom: 8, tiles: ['https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/VIIRS_Black_Marble/default/2016-01-01/GoogleMapsCompatible_Level8/{z}/{y}/{x}.png'] }
+                   : { type: 'raster', tileSize: 256, maxzoom: cfg.sat_max || 15, tiles: ['https://tiles.maps.eox.at/wmts/1.0.0/s2cloudless_3857/default/g/{z}/{y}/{x}.jpg'] },
+        bm: { type: 'raster', tileSize: 256, maxzoom: 8, tiles: ['https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/BlueMarble_NextGeneration/default/GoogleMapsCompatible_Level8/{z}/{y}/{x}.jpeg'] },
+        dem: { type: 'raster-dem', encoding: 'terrarium', tileSize: 256, maxzoom: 14, tiles: ['https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png'] },
+        dem2: { type: 'raster-dem', encoding: 'terrarium', tileSize: 256, maxzoom: 14, tiles: ['https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png'] },
+        rotte: { type: 'geojson', data: { type: 'FeatureCollection', features: [] } },
+        teste: { type: 'geojson', data: { type: 'FeatureCollection', features: [] } }
+      },
+      layers: [
+        // 18/11: da lontano NASA Blue Marble (nessun riquadro), da vicino Sentinel-2 con dissolvenza tra zoom BM_DA e BM_A
+        ...(BM ? [{ id: 'bm', type: 'raster', source: 'bm', paint: { 'raster-resampling': 'linear' } }] : []),
+        { id: 'sat', type: 'raster', source: 'sat', paint: { 'raster-resampling': 'linear', ...(BM ? { 'raster-opacity': ['interpolate', ['linear'], ['zoom'], BM[0], 0, BM[1], 1] } : {}) } },
+        { id: 'ombre', type: 'hillshade', source: 'dem2', paint: { 'hillshade-exaggeration': .35, 'hillshade-shadow-color': '#1a1208', 'hillshade-highlight-color': '#fff6e0' } },
+        { id: 'rotta-bordo', type: 'line', source: 'rotte', layout: { 'line-cap': 'round', 'line-join': 'round' }, paint: { 'line-color': '#1a1208', 'line-width': 9 * U, 'line-opacity': .55 } },   // 18/11: bordo scuro, la rotta si legge anche su deserti e neve
+        { id: 'rotta-alone', type: 'line', source: 'rotte', layout: { 'line-cap': 'round', 'line-join': 'round' }, paint: { 'line-color': '#ffb84a', 'line-width': 14 * U, 'line-blur': 10 * U, 'line-opacity': .45 } },
+        // line-dasharray non accetta espressioni sui dati in MapLibre 5.6: due livelli filtrati per stile
+        { id: 'rotta', type: 'line', source: 'rotte', filter: ['!=', ['get', 'stile'], 'tratteggio'], layout: { 'line-cap': 'round', 'line-join': 'round' }, paint: { 'line-color': '#ffe2a6', 'line-width': 4.5 * U } },
+        { id: 'rotta-tratto', type: 'line', source: 'rotte', filter: ['==', ['get', 'stile'], 'tratteggio'], layout: { 'line-cap': 'butt', 'line-join': 'round' }, paint: { 'line-color': '#ffe2a6', 'line-width': 4.5 * U, 'line-dasharray': [1.6, 1.4] } },
+        { id: 'testa', type: 'circle', source: 'teste', paint: { 'circle-radius': 7 * U, 'circle-color': '#fff3d6', 'circle-blur': .2, 'circle-stroke-color': '#ffb84a', 'circle-stroke-width': 3 * U } }
+      ]
+    }
+  });
+  map.on('load', () => { if (cfg.terreno) map.setTerrain({ source: 'dem', exaggeration: cfg.terreno }); if (cfg.ombre === false || NOTTE) map.setLayoutProperty('ombre', 'visibility', 'none'); ok(true); });   // ombre:false sugli oceani (la batimetria fa riquadri grigi)
+});
+
+function parzialeLinea(pts, p) {
+  if (p <= 0) return null; const seg = []; let tot = 0;
+  for (let i = 0; i < pts.length - 1; i++) { const l = Math.hypot(pts[i + 1][0] - pts[i][0], pts[i + 1][1] - pts[i][1]); seg.push(l); tot += l; }
+  let rest = tot * clamp(p, 0, 1); const out = [pts[0]];
+  for (let i = 0; i < seg.length; i++) {
+    if (rest >= seg[i]) { out.push(pts[i + 1]); rest -= seg[i]; continue; }
+    const f = rest / seg[i]; out.push([pts[i][0] + (pts[i + 1][0] - pts[i][0]) * f, pts[i][1] + (pts[i + 1][1] - pts[i][1]) * f]); break;
+  }
+  return out;
+}
+
+function overlay(t) {
+  const L = document.getElementById('sopra'); let h = '';
+  for (const e of C.etichette || []) {
+    if (t < e.da - .01 || t > e.a + .6) continue;
+    const ent = easeOut(clamp((t - e.da) / .9, 0, 1)), usc = 1 - ease(clamp((t - e.a) / .6, 0, 1)), op = ent * usc;
+    const q = proietta([e.lng, e.lat]);
+    if (e.tipo === 'regione') {
+      const sp = .32 + (1 - ent) * .25;
+      h += `<div class="reg" style="left:${q.x}px;top:${q.y}px;opacity:${op}"><b style="letter-spacing:${sp}em;transform:scale(${1.06 - .06 * ent})">${e.testo}</b>${e.sotto ? `<span style="font:400 ${22 * U}px M;color:#ffe3a8">${e.sotto}</span>` : ''}<i style="width:${70 * ent}%"></i></div>`;
+    } else {
+      const ring = ((t - e.da) % 1.6) / 1.6, rr = (18 + 70 * easeOut(ring)) * U;
+      const asta = (e.altezza || 120) * U * ent;
+      h += `<div class="pin" style="left:${q.x}px;top:${q.y}px;opacity:${usc}">
+        <div class="anello" style="width:${rr * 2}px;height:${rr * 2}px;opacity:${(1 - ring) * .9 * ent}"></div>
+        <div class="punto" style="transform:translate(-50%,-50%) scale(${ent})"></div>
+        <div class="asta" style="height:${asta}px"></div>
+        <div class="carta" style="bottom:${asta + 8 * U}px;opacity:${clamp((t - e.da - .35) / .6, 0, 1)};transform:translateX(-50%) translateY(${(1 - ent) * 14 * U}px)"><b>${e.testo}</b>${e.sotto ? `<span>${e.sotto}</span>` : ''}</div></div>`;
+    }
+  }
+  for (const r of C.percorsi || []) {
+    if (!r.nota || t < r.nota_da) continue;
+    const op = easeOut(clamp((t - r.nota_da) / .7, 0, 1));
+    const a = r.punti[0], b = r.punti[r.punti.length - 1], q = proietta(r.nota_pos || [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2]);   // nota_pos [lng,lat]: dove ancorare la pillola
+    h += `<div class="nota" style="left:${q.x + (r.nota_dx || 0) * U}px;top:${q.y + (r.nota_dy || 0) * U}px;opacity:${op}">${r.nota}</div>`;
+  }
+  L.innerHTML = h;
+  dentro(L);
+}
+
+// 18/11: carte dei pin e note non escono mai dal quadro (si spostano verso l'interno, mai sopra il proprio punto)
+function dentro(L) {
+  const S = document.getElementById('scena').getBoundingClientRect(), m = 14 * U;
+  for (const el of L.querySelectorAll('.carta, .nota')) {
+    const r = el.getBoundingClientRect();
+    if (el.classList.contains('carta')) {   // se il punto del pin è già fuori dal quadro, la carta esce con lui (niente carte staccate)
+      const p = el.parentElement.getBoundingClientRect();
+      if (p.left < S.left || p.left > S.right || p.top < S.top || p.top > S.bottom) continue;
+    }
+    let dx = 0, dy = 0;
+    if (r.left < S.left + m) dx = S.left + m - r.left; else if (r.right > S.right - m) dx = S.right - m - r.right;
+    if (r.top < S.top + m) dy = S.top + m - r.top; else if (r.bottom > S.bottom - 40 * U) dy = S.bottom - 40 * U - r.bottom;
+    if (el.classList.contains('carta')) {   // la carta può scendere solo fino a poco sopra il punto
+      const pin = el.parentElement.getBoundingClientRect();
+      const giu = Math.max(0, pin.top - 26 * U - r.bottom);
+      if (dy > giu) dy = pin.top + 30 * U - r.top;   // non entra sopra il punto: la carta va sotto il punto
+    }
+    if (dx || dy) el.style.transform = (el.classList.contains('nota') ? 'translate(-50%,-50%)' : el.style.transform) + ` translate(${dx}px,${dy}px)`;
+  }
+}
+
+function attesa() {
+  return new Promise(ok => {
+    // 'idle' = tutte le tessere (satellite + rilievo) caricate E disegnate: niente buchi neri ai bordi
+    const t0 = performance.now(); let fatto = false;
+    const fine = () => { if (fatto) return; fatto = true; requestAnimationFrame(() => requestAnimationFrame(() => ok(performance.now() - t0))); };
+    map.once('idle', fine); setTimeout(fine, 20000); map.triggerRepaint();
+  });
+}
+
+window.fotogramma = async t => {
+  // foschia dietro la mappa vicino al suolo: dove il rilievo non arriva si vede cielo velato, mai nero
+  document.getElementById('foschia').style.opacity = clamp((cam.z(t) - 6.5) / 2.5, 0, 1);
+  map.jumpTo({ center: [lngOf(cam.x(t)), latOf(cam.y(t))], zoom: cam.z(t) + (C.zoom_off || 0), pitch: cam.p(t), bearing: cam.b(t) });
+  const rotte = [], teste = [];
+  for (const r of C.percorsi || []) {
+    const p = ease(clamp((t - r.da) / (r.a - r.da), 0, 1)), l = parzialeLinea(r.punti, p);
+    if (l && l.length > 1) { rotte.push({ type: 'Feature', properties: { stile: r.stile || 'pieno' }, geometry: { type: 'LineString', coordinates: l } }); if (p < 1) teste.push({ type: 'Feature', geometry: { type: 'Point', coordinates: l[l.length - 1] } }); }
+  }
+  map.getSource('rotte').setData({ type: 'FeatureCollection', features: rotte });
+  map.getSource('teste').setData({ type: 'FeatureCollection', features: teste });
+  const ms = await attesa();
+  overlay(t);
+  await new Promise(r => requestAnimationFrame(() => r()));
+  return ms;
+};
+</script>
+</body>
+</html>
