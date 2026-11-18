@@ -18,6 +18,14 @@ Funziona da solo da riga di comando, oppure come **skill di Claude Code**: descr
 - ⚡ **Bozza veloce** a metà risoluzione che inquadra esattamente come il definitivo
 - 🆓 Tutte fonti **gratuite**, utilizzabili anche in video monetizzati con il credito (già scritto in basso a sinistra)
 
+## Schermate
+| | |
+|---|---|
+| ![Volo dallo spazio a Derinkuyu](anteprime/volo_derinkuyu.jpg) | ![Roma → Tokyo di notte](anteprime/notte_roma_tokyo.jpg) |
+| **Dallo spazio al punto esatto**: Derinkuyu, Turchia | **Terra di notte** con rotta e distanza: Roma → Tokyo |
+| ![Il viaggio di Marco Polo](anteprime/marco_polo.jpg) | ![Everest in 3D](anteprime/everest_3d.jpg) |
+| **Percorsi animati**: il viaggio di Marco Polo | **Rilievo 3D**: fino in cima all'Everest |
+
 ## Installazione
 Servono [Node.js](https://nodejs.org) 18+ e [ffmpeg](https://ffmpeg.org).
 
