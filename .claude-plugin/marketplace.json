@@ -1,0 +1,14 @@
+{
+  "name": "danilopalomba",
+  "owner": { "name": "Danilo Palomba", "url": "https://github.com/danilopalomba" },
+  "metadata": { "description": "Skill per Claude Code di Danilo Palomba" },
+  "plugins": [
+    {
+      "name": "globo-premium",
+      "source": "./",
+      "description": "Voli di camera su un globo 3D con immagini satellitari vere, per video 9:16 e 16:9.",
+      "version": "1.0.0",
+      "category": "media"
+    }
+  ]
+}

@@ -27,11 +27,20 @@ Funziona da solo da riga di comando, oppure come **skill di Claude Code**: descr
 | **Percorsi animati**: il viaggio di Marco Polo | **Rilievo 3D**: fino in cima all'Everest |
 
 ## Installazione
-Servono [Node.js](https://nodejs.org) 18+ e [ffmpeg](https://ffmpeg.org).
 
+### In Claude Code (consigliato): un comando
+```
+/plugin install globo-premium --marketplace danilopalomba/globo-premium
+```
+Poi chiedi a Claude, per esempio: *«Fammi un volo 9:16 da Roma a Tokyo di notte, 7 secondi, con la distanza in km»*.
+Al primo uso Claude installa da solo quello che serve (`installa.sh`). Servono [Node.js](https://nodejs.org) 18+ e [ffmpeg](https://ffmpeg.org).
+
+Con versioni di Claude Code più vecchie: `/plugin marketplace add danilopalomba/globo-premium` e poi `/plugin install globo-premium@danilopalomba`.
+
+### Da riga di comando
 ```bash
 git clone https://github.com/danilopalomba/globo-premium.git
-cd globo-premium
+cd globo-premium/skills/globo-premium
 bash installa.sh         # una volta sola
 npm run esempio          # bozza di prova: prova.mp4 + prova.jpg
 ```
@@ -39,16 +48,15 @@ npm run esempio          # bozza di prova: prova.mp4 + prova.jpg
 immagini satellitari, la Terra di notte e il rilievo dai server pubblici gratuiti mentre fa il render (serve solo la connessione a internet).
 Il mondo intero in alta risoluzione pesa terabyte, per questo non sta dentro il repository.
 
-### Come skill di Claude Code
-Clona la cartella in `~/.claude/skills/globo-premium`: al primo uso Claude esegue da solo `installa.sh`.
-Poi chiedi a Claude, per esempio: *«Fammi un volo 9:16 da Roma a Tokyo di notte, 7 secondi, con la distanza in km»*.
+Vuoi la skill senza plugin? Copia la cartella `skills/globo-premium` in `~/.claude/skills/`.
 
 ## Uso da riga di comando
 ```bash
+cd skills/globo-premium
 node motore/render.mjs motore/esempi/marco_polo.json bozza.mp4 --scala 0.5 --fps 15 --foglio foglio.jpg   # bozza veloce
 node motore/render.mjs motore/esempi/marco_polo.json marco_polo.mp4                                        # definitivo
 ```
-Il formato del file del viaggio (camera, pin, percorsi, stile notte, rilievo) è spiegato in [SKILL.md](SKILL.md).
+Il formato del file del viaggio (camera, pin, percorsi, stile notte, rilievo) è spiegato in [SKILL.md](skills/globo-premium/SKILL.md).
 Il video esce muto: voce e musica si aggiungono nel montaggio.
 
 ## Licenze
@@ -64,11 +72,12 @@ Il video esce muto: voce e musica si aggiungono nel montaggio.
 animated routes, Earth at night, 3D mountains. Vertical 9:16 or horizontal 16:9, frame-by-frame deterministic MP4 (silent).
 
 ```bash
-bash installa.sh   # once; map imagery needs no keys or downloads, it is streamed at render time
+# Claude Code: /plugin install globo-premium --marketplace danilopalomba/globo-premium
+cd skills/globo-premium && bash installa.sh   # once; map imagery needs no keys or downloads, it is streamed at render time
 node motore/render.mjs motore/esempi/notte_roma_tokyo_169.json out.mp4 --scala 0.5 --fps 15   # draft
 ```
-Use it standalone or as a Claude Code skill (copy the folder to `~/.claude/skills/globo-premium`).
-The journey file format is documented in SKILL.md (in Italian; the keys are short and the examples are self-explanatory).
+Use it standalone or as a Claude Code plugin (one command, see above).
+The journey file format is documented in skills/globo-premium/SKILL.md (in Italian; the keys are short and the examples are self-explanatory).
 Set `"crediti"` in the journey file to translate the on-screen credit line. Code: MIT. Imagery and data: see CREDITI.md
 (EOX Sentinel-2 cloudless 2016 CC BY 4.0, NASA Blue Marble and Black Marble, AWS Terrain Tiles).
 

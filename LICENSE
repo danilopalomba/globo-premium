@@ -21,6 +21,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 ---
-The MIT license covers the code only (motore/index.html, motore/render.mjs,
+The MIT license covers the code only (skills/globo-premium: motore/index.html, motore/render.mjs,
 SKILL.md, examples). Map imagery, elevation data and fonts keep their own
 licenses: see CREDITI.md.

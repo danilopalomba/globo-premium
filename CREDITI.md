@@ -11,7 +11,7 @@ dai server pubblici qui sotto mentre renderizza. Chi pubblica un video deve cita
 | Terra di notte | NASA Black Marble 2016 (VIIRS) via NASA GIBS — https://earthdata.nasa.gov/gibs | Dati NASA, uso libero (credito consigliato) | «NASA Earth Observatory / NASA GIBS – Black Marble 2016» |
 | Rilievo 3D | AWS Terrain Tiles (Mapzen / Tilezen joerd) — https://registry.opendata.aws/terrain-tiles/ | Dati aperti, con attribuzione delle fonti | «Terrain Tiles: Mapzen / AWS» + fonti: https://github.com/tilezen/joerd/blob/master/docs/attribution.md |
 | Motore mappe | MapLibre GL JS 5.6 (caricato da jsDelivr) | BSD-3-Clause | — |
-| Font | Montserrat (motore/font) | SIL Open Font License 1.1 (motore/font/OFL.txt) | — |
+| Font | Montserrat (skills/globo-premium/motore/font) | SIL Open Font License 1.1 (skills/globo-premium/motore/font/OFL.txt) | — |
 
 **Attenzione:** usare solo lo strato EOX **2016** (`s2cloudless_3857`, già impostato).
 Gli strati EOX 2018 e successivi sono CC BY-NC-SA (**non commerciali**): non vanno usati per video monetizzati.

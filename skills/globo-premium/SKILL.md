@@ -13,7 +13,7 @@ installa Playwright e il suo Chromium). Le mappe non vanno scaricate né configu
 le tessere arrivano da sole dai server pubblici durante il render (serve internet).
 
 ```bash
-G=~/.claude/skills/globo-premium/motore      # cambia se la skill è altrove
+G="<cartella di questa skill>/motore"        # la cartella base della skill (dove sta questo SKILL.md)
 node $G/render.mjs viaggio.json bozza.mp4 --scala 0.5 --fps 15 --foglio foglio.jpg   # SEMPRE prima: bozza + foglio da 16 fotogrammi
 node $G/render.mjs viaggio.json clip.mp4                                             # definitivo (w×h del file, 30 fps)
 #   --da 3 --a 6  per renderizzare solo un tratto
@@ -49,5 +49,5 @@ Esempi pronti in `motore/esempi/`: `notte_roma_tokyo.json` (notte + rotta, 9:16)
 - Le etichette lunghe escono dal 9:16: 1-2 parole nel `testo`, il resto in `sotto`.
 
 ## Licenze
-Vedi `CREDITI.md`. Usa solo lo strato EOX **2016** (CC BY 4.0, uso commerciale con credito); MAI gli strati EOX 2018+ (non commerciali).
+Vedi `CREDITI.md` nella radice del repository. Usa solo lo strato EOX **2016** (CC BY 4.0, uso commerciale con credito); MAI gli strati EOX 2018+ (non commerciali).
 Notte: NASA Black Marble 2016. Da lontano: NASA Blue Marble. Rilievo: AWS Terrain Tiles (Mapzen). Copia i crediti nella descrizione del video.

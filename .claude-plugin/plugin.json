@@ -1,0 +1,10 @@
+{
+  "name": "globo-premium",
+  "version": "1.0.0",
+  "description": "Voli di camera su un globo 3D con immagini satellitari vere (dallo spazio al punto esatto, percorsi animati, Terra di notte, montagne 3D) per video 9:16 e 16:9.",
+  "author": { "name": "Danilo Palomba", "url": "https://github.com/danilopalomba" },
+  "homepage": "https://github.com/danilopalomba/globo-premium",
+  "repository": "https://github.com/danilopalomba/globo-premium",
+  "license": "MIT",
+  "keywords": ["globe", "map", "maplibre", "satellite", "video", "shorts", "animation"]
+}
