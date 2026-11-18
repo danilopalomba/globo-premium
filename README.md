@@ -30,7 +30,7 @@ Funziona da solo da riga di comando, oppure come **skill di Claude Code**: descr
 Servono [Node.js](https://nodejs.org) 18+ e [ffmpeg](https://ffmpeg.org).
 
 ```bash
-git clone https://github.com/daxo80cc-jpg/globo-premium.git
+git clone https://github.com/danilopalomba/globo-premium.git
 cd globo-premium
 bash installa.sh         # una volta sola
 npm run esempio          # bozza di prova: prova.mp4 + prova.jpg
